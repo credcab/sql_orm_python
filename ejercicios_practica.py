@@ -66,6 +66,19 @@ def fill():
     # id --> este campo es auto incremental por lo que no deberá completarlo
     # name --> El nombre del tutor (puede ser solo nombre sin apellido)
 
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    tutor = Tutor(name='Alexis')
+    session.add(tutor)
+    tutor = Tutor(name='Fiorella')
+    session.add(tutor)
+    tutor = Tutor(name='Marcos')
+    session.add(tutor)
+    
+    session.commit()
+    
+
     # Llenar la tabla de la secundaria con al menos 5 estudiantes
     # Cada estudiante tiene los posibles campos:
     # id --> este campo es auto incremental por lo que no deberá completarlo
@@ -73,6 +86,30 @@ def fill():
     # age --> cuantos años tiene el estudiante
     # grade --> en que año de la secundaria se encuentra (1-6)
     # tutor --> el tutor de ese estudiante (el objeto creado antes)
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    estudiante = Estudiante(name='Pablo Luciano A.', age=14, grade=2, tutor_id=2)
+    session.add(estudiante)
+    estudiante = Estudiante(name='Mariano Daniel J.', age=14, grade=2, tutor_id=1)
+    session.add(estudiante)
+    estudiante = Estudiante(name='Damaris Ailen C.', age=15, grade=3, tutor_id=1)
+    session.add(estudiante)
+    estudiante = Estudiante(name='Axel Valentín H.', age=13, grade=2, tutor_id=2)
+    session.add(estudiante)
+    estudiante = Estudiante(name='Leonel J.', age=16, grade=4, tutor_id=3)
+    session.add(estudiante)
+    estudiante = Estudiante(name='Patricia Olga A.', age=17, grade=5, tutor_id=3)
+    session.add(estudiante)
+    estudiante = Estudiante(name='Zoe Catalina R.', age=15, grade=3, tutor_id=1)
+    session.add(estudiante)
+    estudiante = Estudiante(name='Paloma Josefina S.', age=14, grade=3, tutor_id=2)
+    session.add(estudiante)
+    estudiante = Estudiante(name='Guillermo H.', age=14, grade=3, tutor_id=1)
+    session.add(estudiante)
+
+    session.commit()
 
     # No olvidarse que antes de poder crear un estudiante debe haberse
     # primero creado el tutor.
@@ -85,6 +122,12 @@ def fetch():
     # Imprimir en pantalla cada objeto que traiga la query
     # Realizar un bucle para imprimir de una fila a la vez
 
+    Session = sessionmaker(bind=engine)
+    session = Session()  
+    query = session.query(Estudiante)
+
+    for estudiante in query:
+        print(estudiante)
 
 def search_by_tutor(tutor):
     print('Operación búsqueda!')
@@ -96,6 +139,12 @@ def search_by_tutor(tutor):
     # deberá crear la query para la tabla estudiante pero
     # buscar por la propiedad de tutor.name
 
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    busqueda = session.query(Estudiante).join(Estudiante.tutor).filter(Tutor.name == tutor)
+    for estudiante in busqueda:
+        print(estudiante)
 
 def modify(id, name):
     print('Modificando la tabla')
@@ -110,6 +159,19 @@ def modify(id, name):
     # TIP: En clase se hizo lo mismo para las nacionalidades con
     # en la función update_persona_nationality
 
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    busqueda = session.query(Tutor).filter(Tutor.name == name)
+    tutor = busqueda.first()
+    
+    busqueda = session.query(Estudiante).filter(Estudiante.id == id)
+    estudiante = busqueda.first()
+    estudiante.tutor_id = tutor.id
+    
+    session.add(estudiante)
+    session.commit()
+
 
 def count_grade(grade):
     print('Estudiante por grado')
@@ -120,19 +182,25 @@ def count_grade(grade):
     # TIP: En clase se hizo lo mismo para las nacionalidades con
     # en la función count_persona
 
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    busqueda = session.query(Estudiante).filter(Estudiante.grade == grade).count()
+    print('en', grade ,'año hay', busqueda, 'estudiantes')
+
 
 if __name__ == '__main__':
     print("Bienvenidos a otra clase de Inove con Python")
     create_schema()   # create and reset database (DB)
-    # fill()
-    # fetch()
+    fill()
+    fetch()
 
-    tutor = 'nombre_tutor'
-    # search_by_tutor(tutor)
+    tutor = 'Fiorella'
+    search_by_tutor(tutor)
 
-    nuevo_tutor = 'nombre_tutor'
+    nuevo_tutor = 'Alexis'
     id = 2
-    # modify(id, nuevo_tutor)
+    modify(id, nuevo_tutor)
 
     grade = 2
-    # count_grade(grade)
+    count_grade(grade)
